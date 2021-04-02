@@ -2,12 +2,21 @@ const mongoose = require('mongoose')
 
 /* scheme */
 const categoryScheme = mongoose.Schema({
-    name: String,
-    image: String,
-    countInStock:{
-        type: Number,
+    name: {
+        type:String,
         required: true
+    },
+    color: {
+        type: String
+    },
+    icon: {
+        type: String
+    },
+    image: {
+        type: String,
+        default :''
     }
+    
 })
 
 /* model */
