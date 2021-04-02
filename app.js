@@ -3,6 +3,7 @@ const express = require("express")
 const app = express();
 const morgan = require('morgan')
 const mongoose = require('mongoose')
+const cors =require('cors')
 
 /* import Routes */
 const productsRoutes = require('./routers/products') //router to paths of products
@@ -17,6 +18,8 @@ const pass = process.env.PASS
 /* middleware */
 app.use(express.json())
 app.use(morgan('tiny'))
+app.use(cors())
+app.options('*',cors())
 
 /* Routers */
 app.use(`${api}/products`,productsRoutes) //use the router to products
