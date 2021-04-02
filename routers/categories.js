@@ -3,13 +3,22 @@ const router = express.Router()
 const {Category} = require('../models/category')
 const { route } = require('./products')
 
-//get
+//get all categories
 router.get(`/`,async (req,res) =>{
     const categoryList = await Category.find()
     if(!categoryList){
         res.status(500).json({error:'something was wrong!'})
     }
     res.send(categoryList)    
+})
+
+//get one category by id
+router.get(`/:id`,async (req,res) =>{
+    const category = await Category.findById(req.params.id)
+    if(!category){
+        res.status(500).json({error:'something was wrong!'})
+    }
+    res.status(200).send(category)    
 })
 
 //post 
