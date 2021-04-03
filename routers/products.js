@@ -4,9 +4,15 @@ const router = express.Router();
 const { Product } = require("../models/product");
 const mongoose = require("mongoose");
 
-//get all products
+//get all products rith or without query
 router.get(`/`, async (req, res) => {
-	const productList = await Product.find().populate("category"); //Product.find().select("name image -_id") para solo mostrar los campos que quiero
+	/* query case  http://localhost:3000/api/v1/products?categories=1223,2545*/
+	let filter = {};
+	if (req.query.categories) {
+		filter = { category: req.query.categories.split(",") };
+	}
+
+	const productList = await Product.find(filter).populate("category"); //Product.find().select("name image -_id") para solo mostrar los campos que quiero
 	if (!productList) {
 		return res.status(500).json({ error: "something was wrong!" });
 	}
