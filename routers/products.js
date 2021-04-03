@@ -174,4 +174,23 @@ router.get(`/get/count`, async (req, res) => {
 	res.send({ count: productCount });
 });
 
+//get all featured products
+router.get(`/get/featured`, async (req, res) => {
+	const products = await Product.find({ isFeatured: true });
+	if (!products) {
+		return res.status(500).json({ error: "something was wrong!" });
+	}
+	res.send(products);
+});
+
+//get a number of featured products
+router.get(`/get/featured/:count`, async (req, res) => {
+	const count = req.params.count ? Number(req.params.count) : 0;
+	const products = await Product.find({ isFeatured: true }).limit(count);
+	if (!products) {
+		return res.status(500).json({ error: "something was wrong!" });
+	}
+	res.send(products);
+});
+
 module.exports = router;
