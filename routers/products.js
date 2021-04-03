@@ -3,13 +3,26 @@ const { Category } = require("../models/category");
 const router = express.Router();
 const { Product } = require("../models/product");
 
-//get
+//get all products
 router.get(`/`, async (req, res) => {
-	const productList = await Product.find();
+	const productList = await Product.find(); //Product.find().select("name image -_id") para solo mostrar los campos que quiero
 	if (!productList) {
-		res.status(500).json({ error: "something was wrong!" });
+		return res.status(500).json({ error: "something was wrong!" });
 	}
 	res.send(productList);
+});
+
+//get one product by id
+router.get(`/:id`, async (req, res) => {
+	try {
+		const product = await Product.findById(req.params.id);
+		if (!product) {
+			return res.status(500).json({ error: "Product not found!" });
+		}
+		res.send(product);
+	} catch (error) {
+		res.status(400).json({ success: false, error: error.message });
+	}
 });
 
 //post
