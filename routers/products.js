@@ -5,7 +5,7 @@ const { Product } = require("../models/product");
 
 //get all products
 router.get(`/`, async (req, res) => {
-	const productList = await Product.find(); //Product.find().select("name image -_id") para solo mostrar los campos que quiero
+	const productList = await Product.find().populate("category"); //Product.find().select("name image -_id") para solo mostrar los campos que quiero
 	if (!productList) {
 		return res.status(500).json({ error: "something was wrong!" });
 	}
@@ -15,7 +15,8 @@ router.get(`/`, async (req, res) => {
 //get one product by id
 router.get(`/:id`, async (req, res) => {
 	try {
-		const product = await Product.findById(req.params.id);
+		//.populate('category') -> cualquier campo conectado a otra coleccion mostrara la informacion
+		const product = await Product.findById(req.params.id).populate("category");
 		if (!product) {
 			return res.status(500).json({ error: "Product not found!" });
 		}
