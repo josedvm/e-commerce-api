@@ -68,7 +68,8 @@ router.post(`/`, async (req, res) => {
 			return res.status(500).send("the product could not be created.");
 
 		res.send(newProduct);
-		/*  console.log({name,image,countInStock})
+		/*  //sin async-await
+		console.log({name,image,countInStock})
     newProduct.save().then(createdProduct => {
         res.status(201).json(createdProduct)
     }).catch(err =>{
@@ -79,6 +80,59 @@ router.post(`/`, async (req, res) => {
     }) */
 	} catch (err) {
 		res.status(400).json({ success: false, error: err.message });
+	}
+});
+
+//put -update product
+router.put("/:id", async (req, res) => {
+	const {
+		name,
+		description,
+		richDescription,
+		image,
+		images,
+		brand,
+		price,
+		category,
+		countInStock,
+		rating,
+		numReviews,
+		dateCreated,
+		isFeatured,
+	} = req.body;
+	try {
+		/* verified category */
+		const findCategory = await Category.findById(category);
+		if (!findCategory) return res.status(400).send(`Invalid category.`);
+
+		let productToUpdate = await Product.findByIdAndUpdate(
+			req.params.id,
+			{
+				name: name,
+				description: description,
+				richDescription: richDescription,
+				image: image,
+				images: images,
+				brand: brand,
+				price: price,
+				category: category,
+				rating: rating,
+				numReviews: numReviews,
+				dateCreated: dateCreated || Date.now(),
+				isFeatured: isFeatured,
+				countInStock: countInStock,
+			},
+			{
+				new: true, //mostrar la nueva info
+			}
+		);
+
+		if (!productToUpdate)
+			return res.status(500).send("the product could not be updated.");
+
+		res.send(productToUpdate);
+	} catch (error) {
+		console.error(error);
 	}
 });
 
