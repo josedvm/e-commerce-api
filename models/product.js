@@ -48,6 +48,10 @@ const productScheme = mongoose.Schema({
         type: Number,
         default :0
     },
+    isFeatured:{
+        type:Boolean,
+        default:false
+    },
     dateCreated: {
         type: Date,
         default :Date.now
