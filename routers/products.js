@@ -21,9 +21,10 @@ router.get(`/`, async (req, res) => {
 
 //get one product by id
 router.get(`/:id`, async (req, res) => {
-	if (!mongoose.isValidObjectId(req.params.id))
-		return res.status(400).send("Invalid id of product");
 	try {
+		if (!mongoose.isValidObjectId(req.params.id))
+			return res.status(400).send("Invalid id of product");
+
 		//.populate('category') -> cualquier campo conectado a otra coleccion mostrara la informacion
 		const product = await Product.findById(req.params.id).populate("category");
 		if (!product) {

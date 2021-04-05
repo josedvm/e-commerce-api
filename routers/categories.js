@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { Category } = require("../models/category");
 const { route } = require("./products");
+const mongoose = require("mongoose");
 
 //get all categories
 router.get(`/`, async (req, res) => {
@@ -14,11 +15,18 @@ router.get(`/`, async (req, res) => {
 
 //get one category by id
 router.get(`/:id`, async (req, res) => {
-	const category = await Category.findById(req.params.id);
-	if (!category) {
-		res.status(500).json({ error: "something was wrong!" });
+	try {
+		if (!mongoose.isValidObjectId(req.params.id))
+			return res.status(400).send("Invalid id of category");
+
+		const category = await Category.findById(req.params.id);
+		if (!category) {
+			return res.status(500).json({ error: "something was wrong!" });
+		}
+		res.status(200).send(category);
+	} catch (error) {
+		res.status(400).json({ success: false, error: error.message });
 	}
-	res.status(200).send(category);
 });
 
 //post
@@ -68,12 +76,10 @@ router.delete("/:id", (req, res) => {
 	Category.findByIdAndRemove(req.params.id)
 		.then((category) => {
 			if (category) {
-				return res
-					.status(200)
-					.json({
-						succes: true,
-						message: `Category with the id: ${req.params.id} deleted.`,
-					});
+				return res.status(200).json({
+					succes: true,
+					message: `Category with the id: ${req.params.id} deleted.`,
+				});
 			} else {
 				return res
 					.status(404)
