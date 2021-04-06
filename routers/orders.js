@@ -3,7 +3,7 @@ const router = express.Router();
 const { Order } = require("../models/order");
 const { OrderItem } = require("../models/orderItem");
 
-//get
+//get todas los ordenes
 router.get(`/`, async (req, res) => {
 	const orderList = await Order.find().populate("user", "name");
 	//.sort({ dateOrdered: -1 }); de mas nuevo a viejo
@@ -12,6 +12,17 @@ router.get(`/`, async (req, res) => {
 		res.status(500).json({ error: "something was wrong!" });
 	}
 	res.send(orderList);
+});
+
+//get una orden by id
+router.get(`/:id`, async (req, res) => {
+	const order = await Order.findById(req.params.id).populate("user", "name");
+	//.sort({ dateOrdered: -1 }); de mas nuevo a viejo
+	//.sort("dateOrdered"); de mas viejo a nuevo
+	if (!order) {
+		res.status(500).json({ error: "something was wrong!" });
+	}
+	res.send(order);
 });
 
 //post - crear una nueva orden de compra
