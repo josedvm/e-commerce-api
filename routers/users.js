@@ -107,6 +107,7 @@ router.post("/login", async (req, res) => {
 		const token = jwt.sign(
 			{
 				userId: user.id,
+				isAdmin: user.isAdmin,
 			},
 			secret //se usa para crear el token
 			/* , {expireIn : "1id"} ejemplo de tiempo de expiracion del token */
