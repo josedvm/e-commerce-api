@@ -71,11 +71,12 @@ router.post("/login", async (req, res) => {
 	//validar contaseña con bcrypt
 	if (user && bcrypt.compareSync(req.body.password, user.passwordHash)) {
 		// se crrea el token para enviar al usuario
+		const secret = process.env.secret;
 		const token = jwt.sign(
 			{
 				userId: user.id,
 			},
-			"secret" //se usa para crear el token
+			secret //se usa para crear el token
 			/* , {expireIn : "1id"} ejemplo de tiempo de expiracion del token */
 		);
 		res.status(200).send({ user: user.email, token });
