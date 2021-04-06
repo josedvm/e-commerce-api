@@ -30,6 +30,15 @@ router.get(`/:id`, async (req, res) => {
 	}
 });
 
+//count users
+router.get(`/get/count`, async (req, res) => {
+	const userCount = await User.countDocuments((count) => count);
+	if (!userCount) {
+		return res.status(500).json({ error: "something was wrong!" });
+	}
+	res.send({ count: userCount });
+});
+
 //post - crear un usuario como admin
 router.post("/", async (req, res) => {
 	const {
