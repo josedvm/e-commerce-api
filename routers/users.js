@@ -127,4 +127,28 @@ router.post("/login", async (req, res) => {
 	}
 });
 
+//delete user
+router.delete("/:id", (req, res) => {
+	//validate id
+	if (!mongoose.isValidObjectId(req.params.id))
+		return res.status(400).send("Invalid id of product");
+
+	User.findByIdAndRemove(req.params.id)
+		.then((product) => {
+			if (product) {
+				return res.status(200).json({
+					succes: true,
+					message: `User with the id: ${req.params.id} deleted.`,
+				});
+			} else {
+				return res
+					.status(404)
+					.json({ succes: false, message: `User not found.` });
+			}
+		})
+		.catch((err) => {
+			return res.status(400).json({ succes: false, error: err });
+		});
+});
+
 module.exports = router;
