@@ -5,6 +5,8 @@ const bcrypt = require("bcryptjs");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 
+mongoose.set("useFindAndModify", false);
+
 //get
 router.get(`/`, async (req, res) => {
 	const userList = await User.find().select("-passwordHash"); //no mostrar passwordhash
@@ -124,6 +126,62 @@ router.post("/login", async (req, res) => {
 		res.status(200).send({ user: user.email, token });
 	} else {
 		res.status(400).send("wrong password");
+	}
+});
+
+//put - modificar un usuario, si entrega nueva contraseña se asigna, sino entrega contraseña se asigna la anterior
+router.put("/:id", async (req, res) => {
+	try {
+		//validar id
+		if (!mongoose.isValidObjectId(req.params.id))
+			return res.status(400).send("Invalid id of user");
+
+		const findUser = await User.findById(req.params.id);
+		let newPassword;
+
+		console.log(
+			`el campo contraseña es este ${req.body.password}, la contraseña antigua es esta ${findUser.passwordHash}`
+		);
+		req.body.password
+			? (newPassword = bcrypt.hashSync(req.body.password, 10))
+			: (newPassword = findUser.passwordHash);
+		console.log(`la nueva contraseña es esta ${newPassword}`);
+		const {
+			name,
+			email,
+			phone,
+			street,
+			apartment,
+			zip,
+			city,
+			country,
+			isAdmin,
+		} = req.body;
+		let userToUpdate = await User.findByIdAndUpdate(
+			req.params.id,
+			{
+				name,
+				email,
+				passwordHash: newPassword,
+				phone,
+				street,
+				apartment,
+				zip,
+				city,
+				country,
+				isAdmin,
+			},
+			{
+				new: true,
+			}
+		);
+
+		if (!userToUpdate)
+			return res.status(500).send("the user could not be updated.");
+
+		res.send(userToUpdate);
+	} catch (error) {
+		return res.status(400).json({ succes: false, error: error.message });
 	}
 });
 
