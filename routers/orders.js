@@ -5,7 +5,9 @@ const { OrderItem } = require("../models/orderItem");
 
 //get
 router.get(`/`, async (req, res) => {
-	const orderList = await Order.find();
+	const orderList = await Order.find().populate("user", "name");
+	//.sort({ dateOrdered: -1 }); de mas nuevo a viejo
+	//.sort("dateOrdered"); de mas viejo a nuevo
 	if (!orderList) {
 		res.status(500).json({ error: "something was wrong!" });
 	}
