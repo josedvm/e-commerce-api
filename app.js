@@ -5,6 +5,7 @@ const morgan = require("morgan");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const authJwt = require("./helpers/jwt");
+const errorHandler = require("./helpers/errorHandler");
 
 /* import Routes */
 const productsRoutes = require("./routers/products"); //router to paths of products
@@ -21,6 +22,7 @@ app.use(morgan("tiny"));
 app.use(cors());
 app.options("*", cors());
 app.use(authJwt()); //use express-jwt to secure the api
+app.use(errorHandler); //usar el manejador de errores
 
 /* Routers */
 app.use(`${api}/products`, productsRoutes); //use the router to products

@@ -30,8 +30,40 @@ router.get(`/:id`, async (req, res) => {
 	}
 });
 
-//post - create a suer
+//post - crear un usuario como admin
 router.post("/", async (req, res) => {
+	const {
+		name,
+		email,
+		password,
+		phone,
+		street,
+		apartment,
+		zip,
+		city,
+		country,
+		isAdmin,
+	} = req.body;
+	let newUser = new User({
+		name,
+		email,
+		passwordHash: bcrypt.hashSync(password, 10),
+		phone,
+		street,
+		apartment,
+		zip,
+		city,
+		country,
+		isAdmin,
+	});
+	newUser = await newUser.save();
+	if (!newUser) return res.status(500).send("the user could not be created.");
+
+	res.send(newUser);
+});
+
+//post - registarse como usuario
+router.post("/register", async (req, res) => {
 	const {
 		name,
 		email,
