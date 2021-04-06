@@ -3,6 +3,7 @@ const router = express.Router();
 const { User } = require("../models/user");
 const bcrypt = require("bcryptjs");
 const mongoose = require("mongoose");
+const jwt = require("jsonwebtoken");
 
 //get
 router.get(`/`, async (req, res) => {
@@ -59,6 +60,28 @@ router.post("/", async (req, res) => {
 	if (!newUser) return res.status(500).send("the user could not be created.");
 
 	res.send(newUser);
+});
+
+//login
+router.post("/login", async (req, res) => {
+	const user = await User.findOne({ email: req.body.email });
+
+	if (!user) return res.status(400).send("user not found");
+	console.log({ user });
+	//validar contaseña con bcrypt
+	if (user && bcrypt.compareSync(req.body.password, user.passwordHash)) {
+		// se crrea el token para enviar al usuario
+		const token = jwt.sign(
+			{
+				userId: user.id,
+			},
+			"secret" //se usa para crear el token
+			/* , {expireIn : "1id"} ejemplo de tiempo de expiracion del token */
+		);
+		res.status(200).send({ user: user.email, token });
+	} else {
+		res.status(400).send("wrong password");
+	}
 });
 
 module.exports = router;
