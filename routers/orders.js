@@ -16,7 +16,20 @@ router.get(`/`, async (req, res) => {
 
 //get una orden by id
 router.get(`/:id`, async (req, res) => {
-	const order = await Order.findById(req.params.id).populate("user", "name");
+	const order = await Order.findById(req.params.id)
+		.populate("user", "name")
+		.populate("orderItems"); //traer la informacion de la tabla orderItems
+	//.populate({ path: "orderItems", populate: "product" }); dentro de orderItema traer la info del campo product
+
+	/* .populate({ anidado
+			path: "orderItems",
+			populate: {
+				path: "product",
+				populate: { path: "category", select: "_id image" },
+				select: "category",
+			},
+		}); */
+
 	//.sort({ dateOrdered: -1 }); de mas nuevo a viejo
 	//.sort("dateOrdered"); de mas viejo a nuevo
 	if (!order) {
