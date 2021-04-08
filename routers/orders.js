@@ -119,4 +119,24 @@ router.put("/:id", async (req, res) => {
 	}
 });
 
+//delete una orden
+router.delete("/:id", (req, res) => {
+	Order.findByIdAndRemove(req.params.id)
+		.then((order) => {
+			if (order) {
+				return res.status(200).json({
+					succes: true,
+					message: `Order with the id: ${req.params.id} deleted.`,
+				});
+			} else {
+				return res
+					.status(404)
+					.json({ succes: false, message: `Order not found.` });
+			}
+		})
+		.catch((err) => {
+			return res.status(400).json({ succes: false, error: err });
+		});
+});
+
 module.exports = router;
