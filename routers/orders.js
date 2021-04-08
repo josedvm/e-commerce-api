@@ -18,7 +18,15 @@ router.get(`/`, async (req, res) => {
 router.get(`/:id`, async (req, res) => {
 	const order = await Order.findById(req.params.id)
 		.populate("user", "name")
-		.populate("orderItems"); //traer la informacion de la tabla orderItems
+		.populate({
+			path: "orderItems",
+			populate: {
+				path: "product",
+				populate: { path: "category", select: "name color " },
+				select: "name image",
+			},
+			select: "-quantity -__v ",
+		}); //traer la informacion de la tabla orderItems
 	//.populate({ path: "orderItems", populate: "product" }); dentro de orderItema traer la info del campo product
 
 	/* .populate({ anidado
