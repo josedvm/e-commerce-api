@@ -96,4 +96,27 @@ router.post("/", async (req, res) => {
 	res.send(newOrder);
 });
 
+//put -update Order - cambiar solo el estado de la orden
+router.put("/:id", async (req, res) => {
+	const id = req.params.id;
+	try {
+		const orderToUpdate = await Order.findByIdAndUpdate(
+			id,
+			{
+				status: req.body.status,
+			},
+			{
+				new: true, //mostrar la nueva info
+			}
+		);
+
+		if (!orderToUpdate)
+			return res.status(500).send("the order could not be update.");
+
+		res.send(orderToUpdate);
+	} catch (error) {
+		console.error(error);
+	}
+});
+
 module.exports = router;
