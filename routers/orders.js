@@ -122,8 +122,12 @@ router.put("/:id", async (req, res) => {
 //delete una orden
 router.delete("/:id", (req, res) => {
 	Order.findByIdAndRemove(req.params.id)
-		.then((order) => {
+		.then(async (order) => {
 			if (order) {
+				//borrar tambien los orderItems dentro de Order
+				await order.orderItems.map(async (orderItem) => {
+					await OrderItem.findByIdAndRemove(orderItem);
+				});
 				return res.status(200).json({
 					succes: true,
 					message: `Order with the id: ${req.params.id} deleted.`,
