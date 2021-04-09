@@ -57,7 +57,6 @@ router.post("/", async (req, res) => {
 		country,
 		phone,
 		status,
-		totalPrice,
 		user,
 	} = req.body;
 	// crear primero los orderItems para retornar sus ids y agregarlos a la nueva orden
@@ -74,7 +73,20 @@ router.post("/", async (req, res) => {
 	);
 
 	let orderItemsIds = await orderItemsIdsPromise;
-	console.log(orderItemsIds);
+	//calcular el precio total mediante los ids de orderItems
+	let totalPriceOrder = await Promise.all(
+		orderItemsIds.map(async (idOrderItem) => {
+			let orderItem = await OrderItem.findById(idOrderItem).populate(
+				"product",
+				"price"
+			);
+			let totalPriceOrderItem = orderItem.quantity * orderItem.product.price;
+			return totalPriceOrderItem;
+		})
+	);
+	console.log(totalPriceOrder);
+	//sumar los precios totales de cada OrderItem para tener el total de Order
+	totalPriceOrder = totalPriceOrder.reduce((a, b) => a + b, 0);
 
 	let newOrder = new Order({
 		orderItems: orderItemsIds,
@@ -85,7 +97,7 @@ router.post("/", async (req, res) => {
 		country,
 		phone,
 		status,
-		totalPrice,
+		totalPrice: totalPriceOrder,
 		user,
 	});
 
