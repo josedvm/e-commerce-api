@@ -1,3 +1,4 @@
+const e = require("cors");
 const express = require("express");
 const router = express.Router();
 const { Order } = require("../models/order");
@@ -41,9 +42,26 @@ router.get(`/:id`, async (req, res) => {
 	//.sort({ dateOrdered: -1 }); de mas nuevo a viejo
 	//.sort("dateOrdered"); de mas viejo a nuevo
 	if (!order) {
-		res.status(500).json({ error: "something was wrong!" });
+		return res.status(500).json({ error: "something was wrong!" });
 	}
 	res.send(order);
+});
+
+// contar el precio total de todas las ordenes
+router.get("/get/totalsales", async (req, res) => {
+	try {
+		const totalSales = await Order.aggregate([
+			{ $group: { _id: null, totalSales: { $sum: "$totalPrice" } } },
+		]);
+		if (!totalSales) {
+			return res
+				.status(400)
+				.json({ error: "The total sales could not be generated" });
+		}
+		res.send({ totalSales: totalSales.pop().totalSales });
+	} catch (error) {
+		console.error(error);
+	}
 });
 
 //post - crear una nueva orden de compra
