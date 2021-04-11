@@ -1,6 +1,7 @@
 const e = require("cors");
 const express = require("express");
 const router = express.Router();
+const mongoose = require("mongoose");
 const { Order } = require("../models/order");
 const { OrderItem } = require("../models/orderItem");
 
@@ -71,6 +72,32 @@ router.get(`/get/count`, async (req, res) => {
 		return res.status(500).json({ error: "something was wrong!" });
 	}
 	res.send({ count: orderCount });
+});
+
+//retornar las ordenes de compra de un usuario mediannte el id
+router.get(`/get/userorders/:userid`, async (req, res) => {
+	//validate id
+	if (!mongoose.isValidObjectId(req.params.userid))
+		return res.status(400).send("Invalid id of user");
+	try {
+		const userOrdersList = await Order.find({ user: req.params.userid })
+			.populate({
+				path: "orderItems",
+				populate: {
+					path: "product",
+					populate: { path: "category", select: "_id image" },
+					select: "category",
+				},
+			})
+			.sort({ dateOrdered: -1 });
+
+		if (!userOrdersList) {
+			return res.status(500).json({ error: "something was wrong!" });
+		}
+		res.send(userOrdersList);
+	} catch (error) {
+		console.error(error);
+	}
 });
 
 //post - crear una nueva orden de compra
