@@ -64,6 +64,15 @@ router.get("/get/totalsales", async (req, res) => {
 	}
 });
 
+//count orders
+router.get(`/get/count`, async (req, res) => {
+	const orderCount = await Order.countDocuments((count) => count);
+	if (!orderCount) {
+		return res.status(500).json({ error: "something was wrong!" });
+	}
+	res.send({ count: orderCount });
+});
+
 //post - crear una nueva orden de compra
 router.post("/", async (req, res) => {
 	const {
