@@ -3,6 +3,21 @@ const { Category } = require("../models/category");
 const router = express.Router();
 const { Product } = require("../models/product");
 const mongoose = require("mongoose");
+const multer = require("multer");
+// destino de las imagenes que se suben y poner un nmbre a la imagen que no se repita
+const storage = multer.diskStorage({
+	destination: function (req, file, cb) {
+		cb(null, "public/uploads");
+	},
+	filename: function (req, file, cb) {
+		//const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+		const filename = file.originalname.split(" ").join("-");
+		//cb(null, file.fieldname + "-" + uniqueSuffix);
+		cb(null, filename + "-" + Date.now());
+	},
+});
+//usar las opciones de upload antes creadas
+const uploadOptions = multer({ storage: storage });
 
 //get all products rith or without query
 router.get(`/`, async (req, res) => {
@@ -36,13 +51,13 @@ router.get(`/:id`, async (req, res) => {
 	}
 });
 
-//post
-router.post(`/`, async (req, res) => {
+//post - se usa multer para subir la imagen
+router.post(`/`, uploadOptions.single("image"), async (req, res) => {
 	const {
 		name,
 		description,
 		richDescription,
-		image,
+		//image,
 		images,
 		brand,
 		price,
@@ -58,11 +73,16 @@ router.post(`/`, async (req, res) => {
 		const findCategory = await Category.findById(category);
 		if (!findCategory) return res.status(400).send(`Invalid category.`);
 
+		//se toma el nombre de la imagen
+		const filename = req.file.filename;
+		//se toma la ruta base para concatenar con la imagen
+		const basePath = `${req.protocol}://${req.get("host")}/public/upload/`;
+
 		let newProduct = new Product({
 			name: name,
 			description: description,
 			richDescription: richDescription,
-			image: image,
+			image: `${basePath}${filename}`,
 			images: images,
 			brand: brand,
 			price: price,
