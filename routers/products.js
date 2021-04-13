@@ -85,6 +85,10 @@ router.post(`/`, uploadOptions.single("image"), async (req, res) => {
 		const findCategory = await Category.findById(category);
 		if (!findCategory) return res.status(400).send(`Invalid category.`);
 
+		//verificar que se haya mandado imagen
+		const file = req.file;
+		if (!file) return res.status(400).send(`No image in the product`);
+
 		//se toma el nombre de la imagen
 		const filename = req.file.filename;
 		//se toma la ruta base para concatenar con la imagen
