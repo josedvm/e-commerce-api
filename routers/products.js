@@ -4,16 +4,28 @@ const router = express.Router();
 const { Product } = require("../models/product");
 const mongoose = require("mongoose");
 const multer = require("multer");
+
+// tipos validos de imagenes
+const FILE_TYPE_MAP = {
+	"image/png": "png",
+	"image/jpg": "jpg",
+	"image/jpeg": "jpeg",
+};
 // destino de las imagenes que se suben y poner un nmbre a la imagen que no se repita
 const storage = multer.diskStorage({
 	destination: function (req, file, cb) {
-		cb(null, "public/uploads");
+		const isValidExtension = FILE_TYPE_MAP[file.mimetype];
+		let uploadError = new Error("Invalid image type.");
+		if (isValidExtension) uploadError = null;
+		cb(uploadError, "public/uploads");
 	},
 	filename: function (req, file, cb) {
+		//tomar la extension de la imagen
+		const extension = FILE_TYPE_MAP[file.mimetype];
 		//const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
 		const filename = file.originalname.split(" ").join("-");
 		//cb(null, file.fieldname + "-" + uniqueSuffix);
-		cb(null, filename + "-" + Date.now());
+		cb(null, `${filename}-${Date.now()}.${extension}`);
 	},
 });
 //usar las opciones de upload antes creadas
