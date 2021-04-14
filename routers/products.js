@@ -200,7 +200,7 @@ router.put(
 				return res.status(400).send("Images to update not found.");
 			}
 			//se toma la ruta base para concatenar con la imagen
-			const basePath = `${req.protocol}://${req.get("host")}/public/upload/`;
+			const basePath = `${req.protocol}://${req.get("host")}/public/uploads/`;
 
 			let imagesPaths = files.map((file) => {
 				return `${basePath}${file.filename}`;

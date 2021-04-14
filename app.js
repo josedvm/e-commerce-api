@@ -23,6 +23,7 @@ app.use(cors());
 app.options("*", cors());
 app.use(authJwt()); //use express-jwt to secure the api
 app.use(errorHandler); //usar el manejador de errores
+app.use("/public/uploads", express.static(__dirname + "/public/uploads")); //definir la carpeta uploads de public como estatica
 
 /* Routers */
 app.use(`${api}/products`, productsRoutes); //use the router to products
