@@ -184,6 +184,49 @@ router.put("/:id", async (req, res) => {
 	}
 });
 
+//put -update galery images of a product by id
+router.put(
+	"/gallery-images/:id",
+	uploadOptions.fields([{ name: "images", maxCount: 3 }]), //or .array("images",3)
+	async (req, res) => {
+		if (!mongoose.isValidObjectId(req.params.id))
+			return res.status(400).send("Invalid id of product");
+
+		try {
+			//verificar si hay imagenes
+			let files = req.files.images;
+
+			if (!files) {
+				return res.status(400).send("Images to update not found.");
+			}
+			//se toma la ruta base para concatenar con la imagen
+			const basePath = `${req.protocol}://${req.get("host")}/public/upload/`;
+
+			let imagesPaths = files.map((file) => {
+				return `${basePath}${file.filename}`;
+			});
+			console.log(imagesPaths);
+
+			let productToUpdate = await Product.findByIdAndUpdate(
+				req.params.id,
+				{
+					images: imagesPaths,
+				},
+				{
+					new: true, //mostrar la nueva info
+				}
+			);
+
+			if (!productToUpdate)
+				return res.status(500).send("the product could not be updated.");
+
+			res.send(productToUpdate);
+		} catch (error) {
+			res.status(400).json({ success: false, error: err.message });
+		}
+	}
+);
+
 //delete
 router.delete("/:id", (req, res) => {
 	//validate id
